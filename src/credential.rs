@@ -893,13 +893,13 @@ mod test {
     use rand_chacha::ChaCha8Rng;
     use serde_test::{assert_de_tokens, assert_tokens, Token};
     use trussed::{
-        client::{Chacha8Poly1305, Sha256},
         key::{Kind, Secrecy},
-        store::keystore::{ClientKeystore, Keystore as _},
-        types::Location,
+        store::{ClientKeystore, Keystore as _},
         virt::{self, StoreConfig},
         Platform as _,
     };
+    use trussed_core::mechanisms::{Chacha8Poly1305, Sha256};
+    use trussed_core::types::Location;
 
     fn credential_data() -> CredentialData {
         CredentialData {
@@ -1049,7 +1049,14 @@ mod test {
 
     #[test]
     fn skip_credential_data_options() {
-        use trussed::{cbor_deserialize as deserialize, cbor_serialize_bytes as serialize};
+        use cbor_smol::cbor_deserialize as deserialize;
+        fn serialize<T: serde::Serialize, const N: usize>(
+            o: &T,
+        ) -> cbor_smol::Result<heapless_bytes::Bytes<N>> {
+            let mut data = heapless_bytes::Bytes::new();
+            cbor_smol::cbor_serialize_to(o, &mut data)?;
+            Ok(data)
+        }
 
         let credential_data = credential_data();
         let serialization: Bytes<1024> = serialize(&credential_data).unwrap();
@@ -1115,15 +1122,13 @@ mod test {
 
                 let stripped_credential = full.strip();
 
-                let serialized_data: Bytes<1024> =
-                    trussed::cbor_serialize_bytes(&stripped_credential.data).unwrap();
+                let serialized_data: Bytes<1024> = serialize(&stripped_credential.data).unwrap();
                 assert_eq!(
                     delog::hexstr!(&serialized_data).to_string(),
                     delog::hexstr!(SERIALIZED_DATA).to_string()
                 );
 
-                let serialized_credential: Bytes<1024> =
-                    trussed::cbor_serialize_bytes(&stripped_credential).unwrap();
+                let serialized_credential: Bytes<1024> = serialize(&stripped_credential).unwrap();
                 assert_eq!(
                     delog::hexstr!(&serialized_credential).to_string(),
                     delog::hexstr!(SERIALIZED_CREDENTIAL).to_string()
@@ -1475,7 +1480,14 @@ mod test {
     //     ) -> TestResult {
     //     use std::str::FromStr;
     //     use ctap_types::webauthn::{PublicKeyCredentialRpEntity, PublicKeyCredentialUserEntity};
-    //     use trussed::{cbor_deserialize as deserialize, cbor_serialize_bytes as serialize};
+    //     use cbor_smol::cbor_deserialize as deserialize;
+    fn serialize<T: serde::Serialize, const N: usize>(
+        o: &T,
+    ) -> cbor_smol::Result<heapless_bytes::Bytes<N>> {
+        let mut data = heapless_bytes::Bytes::new();
+        cbor_smol::cbor_serialize_to(o, &mut data)?;
+        Ok(data)
+    }
 
     //     let rp_name = &rp_name.as_ref().map(|string| string.as_str());
     //     let rp_url = &rp_url.as_ref().map(|string| string.as_str());

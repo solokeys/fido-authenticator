@@ -400,14 +400,24 @@ where
         use crate::SigningAlgorithm;
 
         let algorithm = SigningAlgorithm::try_from(credential.algorithm)?;
+
+        // `cosey::PublicKey` has no ML-DSA variant, so the key can't be reported.
+        // Return before deriving it, the expansion would only be discarded.
+        #[cfg(feature = "mldsa44")]
+        if matches!(algorithm, SigningAlgorithm::MlDsa44) {
+            return Err(Error::InvalidCredential);
+        }
+
         let cose_public_key = algorithm.derive_public_key(&mut self.trussed, private_key);
         let cose_public_key = match algorithm {
             SigningAlgorithm::P256 => {
-                PublicKey::P256Key(ctap_types::serde::cbor_deserialize(&cose_public_key).unwrap())
+                PublicKey::P256Key(cbor_smol::cbor_deserialize(&cose_public_key).unwrap())
             }
-            SigningAlgorithm::Ed25519 => PublicKey::Ed25519Key(
-                ctap_types::serde::cbor_deserialize(&cose_public_key).unwrap(),
-            ),
+            SigningAlgorithm::Ed25519 => {
+                PublicKey::Ed25519Key(cbor_smol::cbor_deserialize(&cose_public_key).unwrap())
+            }
+            #[cfg(feature = "mldsa44")]
+            SigningAlgorithm::MlDsa44 => return Err(Error::InvalidCredential),
         };
         let cred_protect = match credential.cred_protect {
             Some(x) => Some(x),

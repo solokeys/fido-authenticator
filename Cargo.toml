@@ -12,7 +12,7 @@ description = "FIDO authenticator Trussed app"
 apdu-app = { version = "0.2", optional = true }
 cbor-smol = "0.5"
 cosey = "0.4"
-ctap-types = { version = "=0.6.0-rc.4", features = ["get-info-full", "large-blobs", "third-party-payment"] }
+ctap-types = { version = "0.6.0-rc.5", features = ["get-info-full", "large-blobs", "third-party-payment"] }
 ctaphid-app = { version = "0.2", optional = true }
 delog = "0.1"
 heapless = "0.9"
@@ -39,6 +39,8 @@ credential-id-format-v2 = ["trussed-core/aes256-gcm"]
 # enables support for a large-blob array longer than 1024 bytes
 chunked = ["dep:trussed-chunked"]
 
+mldsa44 = ["trussed-core/mldsa44", "ctap-types/mldsa44"]
+
 log-all = []
 log-none = []
 log-trace = []
@@ -48,12 +50,12 @@ log-warn = []
 log-error = []
 
 [dev-dependencies]
-admin-app = { git = "https://github.com/Nitrokey/admin-app.git", tag = "v0.1.0-nitrokey.21", features = ["migration-tests"] }
 aes = "0.8.4"
 cbc = { version = "0.1.2", features = ["alloc"] }
 ciborium = "0.2.2"
 ciborium-io = "0.2.2"
 cipher = "0.4.4"
+ctap-types = { version = "0.6.0-rc.5", features = ["mldsa44"] }
 ctaphid = { version = "0.3.1", default-features = false }
 ctaphid-dispatch = "0.4"
 delog = { version = "0.1.6", features = ["std-log"] }
@@ -69,17 +71,24 @@ rand = "0.8.4"
 rand_chacha = "0.3"
 sha2 = "0.10"
 serde_test = "1.0.176"
-trussed = { git = "https://github.com/trussed-dev/trussed.git", rev = "b2492feada78ee17b936c99c13df480a4fc6d2f5", features = ["virt"] }
-trussed-staging = { git = "https://github.com/trussed-dev/trussed-staging.git", tag = "v0.4.0", features = ["chunked", "hkdf", "virt", "fs-info"] }
-trussed-usbip = { git = "https://github.com/trussed-dev/pc-usbip-runner.git", rev = "017921df0930707c4af68882ccb1f8b3f1bbf7c5", default-features = false, features = ["ctaphid"] }
+trussed = { git = "https://github.com/solokeys/trussed", rev = "2ea719b28245f0e68960e99aab16131f7f14d8ff", features = ["mldsa44", "virt"] }
+trussed-staging = { version = "0.5", features = ["chunked", "hkdf", "virt", "fs-info"] }
 usbd-ctaphid = "0.4"
 x509-parser = "0.16"
+admin-app = { git = "https://github.com/Nitrokey/admin-app.git", tag = "v0.1.0-nitrokey.22", features = ["migration-tests"] }
 
 [package.metadata.docs.rs]
 features = ["chunked", "dispatch"]
 
 [patch.crates-io]
-trussed = { git = "https://github.com/trussed-dev/trussed.git", rev = "b2492feada78ee17b936c99c13df480a4fc6d2f5" }
+# https://github.com/solokeys/ctap-types/tree/v0.7
+ctap-types = { git = "https://github.com/solokeys/ctap-types", rev = "3a5bcecb5286630f38dcc3c65a8f500f7abf2d42" }
+trussed = { git = "https://github.com/solokeys/trussed", rev = "2ea719b28245f0e68960e99aab16131f7f14d8ff" }
+trussed-core = { git = "https://github.com/solokeys/trussed", rev = "2ea719b28245f0e68960e99aab16131f7f14d8ff" }
+
+[patch."https://github.com/trussed-dev/trussed.git"]
+trussed = { git = "https://github.com/solokeys/trussed", rev = "2ea719b28245f0e68960e99aab16131f7f14d8ff" }
+trussed-core = { git = "https://github.com/solokeys/trussed", rev = "2ea719b28245f0e68960e99aab16131f7f14d8ff" }
 
 [profile.test]
 opt-level = 2

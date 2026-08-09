@@ -25,12 +25,14 @@ use rand::{
     distributions::{Distribution, Uniform},
     RngCore as _,
 };
+use trussed::types::ui::Status;
 use trussed::{
     backend::BackendId,
-    platform::{consent::Level, reboot::To, ui::Status, Platform as _, UserInterface},
+    platform::{Platform as _, UserInterface},
     store::Store as _,
     virt::{self, StoreConfig},
 };
+use trussed_core::types::{consent::Level, reboot::To};
 use trussed_staging::virt::{BackendIds, Client, Dispatcher};
 
 use crate::webauthn::Request;

@@ -143,6 +143,9 @@ impl<UP: UserPresence, T: TrussedRequirements> Authenticator for crate::Authenti
             }
         };
 
+        // Copy into the fixed `Bytes<1024>`: the `Message` read is sized by mldsa44.
+        let cert =
+            ctap_types::Bytes::<1024>::try_from(&*cert).map_err(|_| Error::NotEnoughMemory)?;
         Ok(register::Response::new(
             0x05,
             &cose_key,

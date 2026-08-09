@@ -8,10 +8,10 @@ edition = "2021"
 cargo-fuzz = true
 
 [dependencies]
-ctap-types = { version = "=0.6.0-rc.4", features = ["arbitrary"] }
+ctap-types = { version = "0.6.0-rc.5", features = ["arbitrary"] }
 libfuzzer-sys = "0.4"
-trussed = { version = "0.1", features = ["certificate-client", "crypto-client", "filesystem-client", "management-client", "aes256-cbc", "ed255", "p256", "sha256"] }
-trussed-staging = { version = "0.4.0", features = ["chunked", "hkdf", "virt", "fs-info"] }
+trussed = { git = "https://github.com/solokeys/trussed", rev = "2ea719b28245f0e68960e99aab16131f7f14d8ff", features = ["virt"] }
+trussed-staging = { version = "0.5", features = ["chunked", "hkdf", "virt", "fs-info"] }
 
 [dependencies.fido-authenticator]
 path = ".."
@@ -24,5 +24,11 @@ doc = false
 bench = false
 
 [patch.crates-io]
-trussed = { git = "https://github.com/trussed-dev/trussed.git", rev = "b2492feada78ee17b936c99c13df480a4fc6d2f5" }
-trussed-staging = { git = "https://github.com/trussed-dev/trussed-staging.git", tag = "v0.4.0" }
+# https://github.com/solokeys/ctap-types/tree/v0.7
+ctap-types = { git = "https://github.com/solokeys/ctap-types", rev = "3a5bcecb5286630f38dcc3c65a8f500f7abf2d42" }
+trussed = { git = "https://github.com/solokeys/trussed", rev = "2ea719b28245f0e68960e99aab16131f7f14d8ff" }
+trussed-core = { git = "https://github.com/solokeys/trussed", rev = "2ea719b28245f0e68960e99aab16131f7f14d8ff" }
+
+[patch."https://github.com/trussed-dev/trussed.git"]
+trussed = { git = "https://github.com/solokeys/trussed", rev = "2ea719b28245f0e68960e99aab16131f7f14d8ff" }
+trussed-core = { git = "https://github.com/solokeys/trussed", rev = "2ea719b28245f0e68960e99aab16131f7f14d8ff" }
